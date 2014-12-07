@@ -1,0 +1,12 @@
+install.packages("data.table")
+library(data.table)
+datefilter <- 'findstr /b /c:"1/2/2007" /c:"2/2/2007" /c:"Date;" household_power_consumption.txt'
+filtdata <- paste0(system(datefilter, intern = T), collapse = "\n")
+epcdata <- fread(filtdata, sep = ";", header = T, na.strings = '?')
+datentime <- strptime(paste(epcdata$Date,epcdata$Time),format='%d/%m/%Y %H:%M:%S')
+png(file="plot3.png")
+with(epcdata,plot(datentime,Sub_metering_1,xlab="",ylab="Energy Submetering",type='l'))
+with(epcdata, lines(datentime,Sub_metering_2,col="red"))
+with(epcdata, lines(datentime,Sub_metering_3,col="blue"))
+legend("topright",pch="__",col=c("black","red","blue"),legend=c("Sub_metering_1","Sub_metering_2","Sub_metering_3"))
+dev.off()

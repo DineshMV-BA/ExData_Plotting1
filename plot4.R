@@ -1,0 +1,18 @@
+install.packages("data.table")
+library(data.table)
+datefilter <- 'findstr /b /c:"1/2/2007" /c:"2/2/2007" /c:"Date;" household_power_consumption.txt'
+filtdata <- paste0(system(datefilter, intern = T), collapse = "\n")
+epcdata <- fread(filtdata, sep = ";", header = T, na.strings = '?')
+datentime <- strptime(paste(epcdata$Date,epcdata$Time),format='%d/%m/%Y %H:%M:%S')
+png(file="plot4.png")
+par(mfrow=c(2,2))
+with(epcdata,{
+     plot(datentime,Global_active_power,xlab="",ylab="Global Active Power",type='l')
+     plot(datentime,Voltage,xlab="datetime",ylab="Voltage",type='l')
+     plot(datentime,Sub_metering_1,xlab="",ylab="Energy Submetering",type='l')
+     lines(datentime,Sub_metering_2,col="red")
+     lines(datentime,Sub_metering_3,col="blue")
+     legend("topright",pch="__",col=c("black","red","blue"),legend=c("Sub_metering_1","Sub_metering_2","Sub_metering_3"),bty="n")
+     plot(datentime,epcdata$Global_reactive_power,xlab="datetime",ylab="Global_reactive_power",type='l')
+})
+dev.off()
